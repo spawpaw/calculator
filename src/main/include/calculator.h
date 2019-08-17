@@ -46,6 +46,12 @@ protected:
     int pushNode(Node *node);
 
     /**
+     *
+     * @return
+     */
+    double calculateTraversal(Node *node);
+
+    /**
      * 将表达式解析为语法树
      */
     void analyze();
@@ -53,7 +59,7 @@ protected:
     /**
      * 打印语法树
      */
-    void printLATree();
+    void printGrammarTree();
 
     /**
      * 后续遍历语法树

@@ -3,8 +3,8 @@
 #define CALCULATOR_UTILS_H
 
 /////////////////////////////////////////////环境
-#define ENV_TEST
-//#define ENV_PROD
+//#define ENV_TEST
+#define ENV_PROD
 
 
 
@@ -60,9 +60,9 @@ using namespace std;
 
 
 #ifdef LOG_LEVEL_WARNING
-#define logv(s) cout<<"[VERBOSE]:"<<s;
-#define logd(s) cout<<"[DEBUG  ]:"<<s;
-#define logi(s) cout<<"[INFO   ]:"<<s;
+#define logv(s);
+#define logd(s);
+#define logi(s);
 #define logw(s) cout<<"[WARNING]:"<<s;
 #define loge(s) cout<<"[ERROR  ]:"<<s;
 #endif //LOG_LEVEL_WARNING

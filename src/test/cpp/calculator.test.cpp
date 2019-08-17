@@ -6,9 +6,7 @@ using namespace std;
 
 int test(const string &expression, double expectedResult) {
     CalculatorLA calculatorLa = CalculatorLA();
-    for (char i : expression) {
-        calculatorLa.nextChar(i);
-    }
+    calculatorLa.nextString(expression);
     double result = calculatorLa.calculate();
     cout << ((result == expectedResult) ? "success" : "fail")
          << " to calc [" << expression << " = " << expectedResult << "].\t";

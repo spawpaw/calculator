@@ -42,7 +42,7 @@ struct Node {
     Node *rChild; // 子节点2，当op为单目运算符此节点为NULL
     Node(NodeType type = NUMBER, double value = 0, Node *parent = nullptr, Node *child1 = nullptr,
          Node *child2 = nullptr)
-            : type(type), value(value), lChild(child1), rChild(child2) {}
+            : type(type), value(value), parent(parent), lChild(child1), rChild(child2) {}
 
 };
 

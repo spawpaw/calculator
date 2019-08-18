@@ -3,6 +3,7 @@
 #define CALCULATOR_UTILS_H
 
 /////////////////////////////////////////////环境
+//#define ENV_DEV
 //#define ENV_TEST
 #define ENV_PROD
 
@@ -16,11 +17,11 @@
 #endif //ENV_DEV
 
 #ifdef ENV_TEST
-#define LOG_LEVEL_VERBOSE
+#define LOG_LEVEL_INFO
 #endif //ENV_TEST
 
 #ifdef ENV_PROD
-#define LOG_LEVEL_WARNING
+#define LOG_LEVEL_NONE
 #endif //ENV_PROD
 
 
@@ -51,30 +52,39 @@ using namespace std;
 
 
 #ifdef LOG_LEVEL_INFO
-#define logv(s) cout<<"[VERBOSE]:"<<s;
-#define logd(s) cout<<"[DEBUG  ]:"<<s;
-#define logi(s) cout<<"[INFO   ]:"<<s;
+#define logv(s)
+#define logd(s)
+#define logi(s) cout<<s;
+//#define logi(s) cout<<"[INFO   ]:"<<s;
 #define logw(s) cout<<"[WARNING]:"<<s;
 #define loge(s) cout<<"[ERROR  ]:"<<s;
 #endif //LOG_LEVEL_INFO
 
 
 #ifdef LOG_LEVEL_WARNING
-#define logv(s);
-#define logd(s);
-#define logi(s);
+#define logv(s)
+#define logd(s)
+#define logi(s)
 #define logw(s) cout<<"[WARNING]:"<<s;
 #define loge(s) cout<<"[ERROR  ]:"<<s;
 #endif //LOG_LEVEL_WARNING
 
 
 #ifdef LOG_LEVEL_ERROR
-#define logv(s) cout<<"[VERBOSE]:"<<s;
-#define logd(s) cout<<"[DEBUG  ]:"<<s;
-#define logi(s) cout<<"[INFO   ]:"<<s;
-#define logw(s) cout<<"[WARNING]:"<<s;
+#define logv(s)
+#define logd(s)
+#define logi(s)
+#define logw(s)
 #define loge(s) cout<<"[ERROR  ]:"<<s;
 #endif //LOG_LEVEL_ERROR
+
+#ifdef LOG_LEVEL_NONE
+#define logv(s)
+#define logd(s)
+#define logi(s)
+#define logw(s)
+#define loge(s)
+#endif //LOG_LEVEL_NONE
 
 
 #endif //CALCULATOR_UTILS_H

@@ -1,5 +1,6 @@
 #include <calculator.h>
 #include <cmath>
+#include <utility>
 #include "string"
 #include "queue"
 #include "set"
@@ -18,7 +19,8 @@ void CalculatorLA::init() {
 
 void CalculatorLA::analyze() {
     for (; currentIndex < expression.length(); ++currentIndex) {
-        int numResult = 0;logd("state:" << currentState << endl)
+        int numResult = 0;
+        logd("state:" << currentState << endl)
         switch (currentState) {
             case DISPATCH_STATE:
                 //分发状态
@@ -30,7 +32,8 @@ void CalculatorLA::analyze() {
                             currentState = PARSE_OPERATOR;
                         }
                     }
-                    currentState = PARSE_NUMBER;logd("error" << endl);
+                    currentState = PARSE_NUMBER;
+                    logd("error" << endl);
                 } else {
                     currentState = PARSE_OPERATOR;
                 }
@@ -89,13 +92,15 @@ void CalculatorLA::analyze() {
                     case ')':
                         pushNode(new Node(OP_R_BRACKET));
                         break;
-                    default:logd("error: unsupported op " << expression[currentIndex] << endl);
+                    default:
+                        logd("error: unsupported op " << expression[currentIndex] << endl);
                         break;
                 }
                 prevState = PARSE_OPERATOR;
                 currentState = DISPATCH_STATE;
                 break;
-            default:logd("unhandled state" << endl);
+            default:
+                logd("unhandled state" << endl);
                 break;
         }
     }
@@ -109,18 +114,20 @@ double CalculatorLA::calculate(bool ignoreErrors) {
 
 void CalculatorLA::nextString(string expr) {
     init();
-    this->expression = expr;
+    this->expression = std::move(expr);
 }
 
 
 int CalculatorLA::pushNode(Node *node) {
     logd("push node:" << node->value << endl)
+    Node *p;
     switch (node->type) {
         case NUMBER:
             if (currentTail->type == OP_NEGATIVE || currentTail->type == OP_PERM) {
                 //单目运算符
 
-                if (currentTail->lChild != nullptr) { logd("error: illegal state:" << endl);
+                if (currentTail->lChild != nullptr) {
+                    logd("error: illegal state:1" << endl);
                     return ERR_ILLEGAL_STATE;
                 }
                 currentTail->lChild = node;
@@ -128,12 +135,14 @@ int CalculatorLA::pushNode(Node *node) {
             } else if (currentTail->type > OP_START && currentTail->type < OP_END) {
                 //双目运算符
 
-                if (currentTail->rChild != nullptr) { logd("error: illegal state:" << endl);
+                if (currentTail->rChild != nullptr) {
+                    logd("error: illegal state:2" << endl);
                     return ERR_ILLEGAL_STATE;
                 }
                 currentTail->rChild = node;
                 node->parent = currentTail;
-            } else { logd("error: illegal state:" << endl);
+            } else {
+                logd("error: illegal state:3" << endl);
                 return ERR_ILLEGAL_STATE;
             }
             //树结构不发生变化
@@ -169,18 +178,62 @@ int CalculatorLA::pushNode(Node *node) {
             }
             break;
         case OP_L_BRACKET:
+            //如果当前节点是有第二操作数的节点,或是左括号
+            switch (currentTail->type) {
+                case OP_PLUS:
+                case OP_SUBTRACT:
+                case OP_MULTIPLY:
+                case OP_DIVIDE:
+                case OP_POW:
+                case OP_MODE:
+                case OP_L_BRACKET:
+                    if (currentTail->rChild != nullptr) {
+                        loge("illegal state, number before `(`" << endl)
+                        loge(currentTail->type << endl)
+                        loge(currentTail->rChild->type << endl)
+                    }
+                    Node *plusNode;
+                    plusNode = new Node(OP_PLUS, 0, node);
+                    plusNode->lChild = new Node(NUMBER, 0, plusNode);
+
+                    node->rChild = plusNode;
+
+                    currentTail->rChild = node;
+                    node->parent = currentTail;
+                    currentTail = plusNode;
+                    break;
+                default:
+                    loge("xxx")
+                    break;
+            }
+            break;
         case OP_R_BRACKET:
             //回溯到上一个左括号
-        case OP_LR_BRACKET:logd("error: temporally not support brackets." << endl);
+            p = currentTail;
+            while (p != nullptr && p->type != OP_L_BRACKET) {
+                p = p->parent;
+            }
+            if (p == nullptr) {
+                loge("`)` before `(`" << endl)
+            } else {
+                p->type = OP_LR_BRACKET;
+                currentTail = p->parent;
+            }
+            break;
+        case OP_LR_BRACKET:
+            logd("error: temporally not support brackets." << endl);
             return ERR_NOT_IMPLEMENTED;
-        default:logd("error, not supported node type!" << endl);
+        default:
+            logd("error, not supported node type!" << endl)
+            break;
     }
     return 0;
 }
 
 void CalculatorLA::printGrammarTree() {
     logd("lrd traversal:[" << expression << "]:\t");
-    lrdTraversal(root);logd(endl);
+    lrdTraversal(root);
+    logd(endl);
 }
 
 void CalculatorLA::lrdTraversal(Node *node) {
@@ -234,9 +287,12 @@ void CalculatorLA::lrdTraversal(Node *node) {
             type = "NU";
             break;
     }
-    if (node->type == NUMBER) { logd(node->value);
-    } else { logd(type);
-    }logd(",");
+    if (node->type == NUMBER) {
+        logd(node->value);
+    } else {
+        logd(type);
+    }
+    logd(",");
 //    logd("[" << type << "," << node->value << "]");
 }
 
@@ -250,7 +306,8 @@ double CalculatorLA::calculateTraversal(Node *node) {
         case NUMBER:
             result = node->value;
             break;
-        case OP_START:logd("error: illegal state: OP_START");
+        case OP_START:
+            logd("error: illegal state: OP_START");
             break;
         case OP_PLUS:
             result = lValue + rValue;
@@ -273,15 +330,22 @@ double CalculatorLA::calculateTraversal(Node *node) {
         case OP_NEGATIVE:
             result = -lValue;
             break;
-        case OP_PERM:logd("error: not supported op");
+        case OP_L_BRACKET:
+            result = lValue + rValue;
+            logd("error: illegal state: OP_L_BRACKET" << endl);
             break;
-        case OP_END:logd("error: illegal state: OP_END");
+        case OP_R_BRACKET:
+            result = lValue + rValue;
+            logd("error: illegal state: OP_R_BRACKET" << endl);
             break;
-        case OP_L_BRACKET:logd("error: illegal state: OP_L_BRACKET");
+        case OP_LR_BRACKET:
+            result = lValue + rValue;
             break;
-        case OP_R_BRACKET:logd("error: illegal state: OP_R_BRACKET");
+        case OP_PERM:
+            logd("error: not supported op" << endl);
             break;
-        case OP_LR_BRACKET:logd("error: illegal state: OP_LR_BRACKET");
+        case OP_END:
+            logd("error: illegal state: OP_END" << endl);
             break;
     }
     return result;

@@ -22,4 +22,11 @@
 ## 使用方式
 
 #### C++
-下载calculator.exe, 
+首先[下载calculator.exe](https://github.com/spawpaw/calculator/releases), 
+###### 直接打开
+
+![](./doc/cpp-calc-call-directly.png)
+
+###### 在参数中传入算式
+
+![](./doc/cpp-calc-call-by-arg.png)
